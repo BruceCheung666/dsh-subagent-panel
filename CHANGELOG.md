@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.1
+
+- 仅文档变更：README 增加致谢，灵感来自
+  [kadhygh/AgentMonitorOverlay](https://github.com/kadhygh/AgentMonitorOverlay) 项目。
+
 ## 0.1.0
 
 首个版本。

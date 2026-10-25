@@ -205,6 +205,11 @@ icon.svg           插件列表图标
 
 见 [CHANGELOG.md](CHANGELOG.md)。
 
+## 致谢
+
+本插件的灵感来自 [kadhygh/AgentMonitorOverlay](https://github.com/kadhygh/AgentMonitorOverlay/)
+项目——感谢作者 [@kadhygh](https://github.com/kadhygh) 与贡献者的开源工作。
+
 ## License
 
 [MIT](LICENSE) © 2026 BruceCheung666
