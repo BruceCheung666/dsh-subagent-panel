@@ -1,0 +1,7 @@
+# subagent-panel 的 bundle 层：向 profile 插入一行插件。
+#
+# - 行 id 全局唯一，用户自己的 cordis.patch.yml 按 id 覆盖这一行。
+# - 对同一行再次给出 config 会整体替换原 config，不是合并。
+- insert:
+    - id: subagent-panel
+      name: '@brucecheung666/dsh-subagent-panel'

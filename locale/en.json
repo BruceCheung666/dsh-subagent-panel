@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "Subagent panel",
+    "description": "A collapsible subagent panel beside the conversation: only the current session's subagent relations (root, itself, subagents). Click a row to switch."
+  }
+}
