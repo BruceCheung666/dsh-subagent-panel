@@ -156,12 +156,19 @@ window.__ModuleLoader__.load({
       '.sa-layer{position:fixed;inset:0;z-index:21;pointer-events:none;}',
       // 收起后只剩左缘一个图标按钮（和面板头部的收缩按钮同尺寸），点一下展开面板。
       '.sa-orb{position:absolute;display:grid;place-items:center;width:40px;height:40px;padding:0;box-sizing:border-box;border:0.5px solid var(--dsw-alias-border-l1);border-radius:12px;background:var(--dsw-specific-menu);color:var(--dsw-alias-label-secondary);font:inherit;cursor:pointer;pointer-events:auto;box-shadow:var(--dsw-elevation-soft, none);transition:background 120ms ease,color 120ms ease;}',
-      '.sa-orb:hover{background:var(--dsw-alias-interactive-bg-hover);color:var(--dsw-alias-label-primary);}',
+      // 面板默认沿用 DSH 菜单材质（半透明，背后的对话文字会透出来）。鼠标进入面板后要
+      // 变成不透底：半透明 token 无法直接变实，这里把「菜单材质」和「hover 叠色」分别当作
+      // 背景图层，压在不透明底 `--dsw-alias-bg-base` 上——合成结果与原来的观感一致，但不再透字。
+      '.sa-orb:hover{background:linear-gradient(var(--dsw-alias-interactive-bg-hover),var(--dsw-alias-interactive-bg-hover)),linear-gradient(var(--dsw-specific-menu),var(--dsw-specific-menu)) var(--dsw-alias-bg-base);color:var(--dsw-alias-label-primary);}',
       '.sa-orb:focus-visible{outline:2px solid var(--dsw-alias-state-business-primary);outline-offset:1px;}',
       '.sa-orb > svg{width:18px;height:18px;display:block;}',
       // 展开后的浮层面板。
       // 边框用 0.5px 的 ring shadow 画，不占布局：头部内边距因此能与收起态按钮共用同一个 CORNER_INSET 锚点。
       '.sa-panel{position:absolute;box-sizing:border-box;display:flex;flex-direction:column;overflow:hidden;pointer-events:auto;background:var(--dsw-specific-menu);border-radius:16px;box-shadow:0 0 0 0.5px var(--dsw-alias-border-l1), var(--dsw-elevation-panel, var(--dsw-elevation-soft));}',
+      // 鼠标在面板上时不透底（合成方式同 .sa-orb:hover），移开后回到半透明菜单材质。
+      '.sa-panel:hover{background:linear-gradient(var(--dsw-specific-menu),var(--dsw-specific-menu)) var(--dsw-alias-bg-base);}',
+      // 详情卡在面板 DOM 里：卡片打开期间（包括鼠标跨过行与卡之间的空隙时）面板保持不透底。
+      '.sa-panel:has(.sa-detail){background:linear-gradient(var(--dsw-specific-menu),var(--dsw-specific-menu)) var(--dsw-alias-bg-base);}',
       // 收缩按钮到窗口上边与左边的距离相等，且等于收起态图标按钮的 CORNER_INSET；
       // 左边距同时对齐 .sa-body 的横向内边距 6px。
       '.sa-head{display:flex;flex:none;align-items:center;gap:2px;padding:6px 8px 6px 6px;}',
@@ -216,17 +223,19 @@ window.__ModuleLoader__.load({
       '.sa-task:hover{background:var(--dsw-alias-interactive-bg-hover);}',
       '.sa-task-dot{margin-top:6px;}',
       '.sa-task-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px;}',
-      '.sa-task-subject{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;line-height:17px;color:var(--dsw-alias-label-primary);}',
+      '.sa-task-subject{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;word-break:break-word;font-size:12px;line-height:17px;color:var(--dsw-alias-label-primary);}',
       '.sa-task-meta{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10px;line-height:14px;color:var(--dsw-alias-label-tertiary);}',
       '.sa-task-warn{flex:none;font-size:11px;line-height:17px;color:var(--dsw-alias-state-warn-primary);}',
       '.sa-team-failure{padding:2px 6px 4px;font-size:10px;line-height:14px;color:var(--dsw-alias-state-error-primary);}',
-      // 单个任务的悬浮详情（pointer-events:none，不抢鼠标）。
-      '.sa-detail{position:fixed;z-index:40;box-sizing:border-box;width:288px;max-height:60vh;overflow:hidden;pointer-events:none;padding:10px 12px;border-radius:12px;background:var(--dsw-specific-menu);box-shadow:0 0 0 0.5px var(--dsw-alias-border-l1), var(--dsw-elevation-panel, var(--dsw-elevation-soft));color:var(--dsw-alias-label-secondary);}',
+      // 单个任务的悬浮详情。只在悬浮任务（或卡片本身）时出现，所以始终用不透底材质；
+      // 为了让长描述/长写入范围能看全、能选中复制，卡片接住鼠标：内容超高时在卡片内滚动，
+      // 鼠标移到卡片上不会让它消失（TaskRow 里做延迟收起），面板在卡片打开期间保持不透明。
+      '.sa-detail{position:fixed;z-index:40;box-sizing:border-box;width:576px;max-width:calc(100vw - 16px);max-height:calc(100vh - 16px);overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;pointer-events:auto;user-select:text;padding:10px 12px;border-radius:12px;background:linear-gradient(var(--dsw-specific-menu),var(--dsw-specific-menu)) var(--dsw-alias-bg-base);box-shadow:0 0 0 0.5px var(--dsw-alias-border-l1), var(--dsw-elevation-panel, var(--dsw-elevation-soft));color:var(--dsw-alias-label-secondary);}',
       '.sa-detail-head{display:flex;align-items:center;gap:6px;margin-bottom:2px;}',
       '.sa-detail-id{font-size:10px;line-height:14px;color:var(--dsw-alias-label-tertiary);font-family:var(--dsw-font-family-mono, ui-monospace, SFMono-Regular, Menlo, monospace);}',
       '.sa-detail-status{font-size:10px;line-height:14px;}',
       '.sa-detail-subject{margin-bottom:2px;font-size:12px;line-height:17px;font-weight:600;color:var(--dsw-alias-label-primary);}',
-      '.sa-detail-desc{display:-webkit-box;margin-bottom:6px;-webkit-box-orient:vertical;-webkit-line-clamp:8;overflow:hidden;font-size:11px;line-height:16px;white-space:pre-wrap;word-break:break-word;color:var(--dsw-alias-label-secondary);}',
+      '.sa-detail-desc{margin-bottom:6px;font-size:11px;line-height:16px;white-space:pre-wrap;word-break:break-word;color:var(--dsw-alias-label-secondary);}',
       '.sa-detail-facts{display:flex;flex-direction:column;gap:3px;font-size:10px;line-height:14px;}',
       '.sa-detail-fact{display:flex;gap:8px;}',
       '.sa-detail-key{flex:none;width:52px;color:var(--dsw-alias-label-tertiary);}',
@@ -714,40 +723,51 @@ window.__ModuleLoader__.load({
       return task.ready === false ? 2 : 1
     }
 
-    /** 悬浮详情卡片的宽度与视口留白。 */
-    const TASK_DETAIL_WIDTH = 288
+    /** 悬浮详情卡片的宽度（约面板的两倍）、视口留白，以及离开任务行/卡片后延迟收起的时间。 */
+    const TASK_DETAIL_WIDTH = 576
     const VIEWPORT_MARGIN = 8
+    const DETAIL_HIDE_DELAY = 180
 
-    /** 把详情卡片放在任务行右侧（右边放不下就放左侧），并夹在视口内。 */
+    /**
+     * 把详情卡片放在任务行右侧（右边放不下就放左侧）；宽度在窄窗口里按视口收窄，
+     * 左右都夹在视口内，任何情况下都不越过浏览器边界。顶部先按行对齐，实际高度由 TeamTasks 夹进视口。
+     */
     function detailPlacement(rect) {
       const viewportWidth = Number.isFinite(window.innerWidth) ? window.innerWidth : 1280
-      const viewportHeight = Number.isFinite(window.innerHeight) ? window.innerHeight : 800
+      const width = Math.min(TASK_DETAIL_WIDTH, viewportWidth - 2 * VIEWPORT_MARGIN)
       let left = rect.right + VIEWPORT_MARGIN
-      if (left + TASK_DETAIL_WIDTH > viewportWidth - VIEWPORT_MARGIN) {
-        left = Math.max(VIEWPORT_MARGIN, rect.left - TASK_DETAIL_WIDTH - VIEWPORT_MARGIN)
+      if (left + width > viewportWidth - VIEWPORT_MARGIN) {
+        left = rect.left - width - VIEWPORT_MARGIN
       }
-      const top = Math.max(VIEWPORT_MARGIN, Math.min(rect.top - 4, viewportHeight - 320))
-      return { left: Math.round(left), top: Math.round(top) }
+      left = Math.max(VIEWPORT_MARGIN, Math.min(left, viewportWidth - width - VIEWPORT_MARGIN))
+      return { left: Math.round(left), top: Math.max(VIEWPORT_MARGIN, Math.round(rect.top - 4)), width: Math.round(width) }
     }
 
-    /** 团队任务板的一行（只读；任务由 agent 工具创建/认领/完成）。鼠标悬浮弹出详情卡片。 */
-    function TaskRow({ t, task }) {
+    /** 任务的状态、状态文案与状态点色（行和详情卡共用一套语义）。 */
+    function taskStatus(t, task) {
       const status = task.status === 'pending' && task.ready === false ? 'blocked' : task.status
-      const tone = taskTone(task)
-      const statusText = t(`task.${status === 'in_progress' ? 'inProgress' : status}`)
-      const [detailAt, setDetailAt] = React.useState(null)
+      return {
+        status,
+        tone: taskTone(task),
+        text: t(`task.${status === 'in_progress' ? 'inProgress' : status}`),
+      }
+    }
+
+    /** 团队任务板的一行（只读；任务由 agent 工具创建/认领/完成）。 */
+    function TaskRow({ t, task, onEnter, onLeave }) {
+      const { status, tone, text } = taskStatus(t, task)
       const meta = [
-        statusText,
+        text,
         task.ownerName ? t('task.owner', { name: task.ownerName }) : '',
         task.blockedBy.length > 0 ? t('task.depends', { n: task.blockedBy.length }) : '',
       ].filter(Boolean).join(' · ')
 
-      const row = h('div', {
+      return h('div', {
         className: 'sa-task',
         'data-task-id': task.id,
         'data-task-status': status,
-        onMouseEnter: (event) => { setDetailAt(detailPlacement(event.currentTarget.getBoundingClientRect())) },
-        onMouseLeave: () => { setDetailAt(null) },
+        onMouseEnter: onEnter,
+        onMouseLeave: onLeave,
       },
         h('span', { className: 'sa-dot sa-task-dot', 'data-tone': tone, 'aria-hidden': true }),
         h('span', { className: 'sa-task-main' },
@@ -762,9 +782,13 @@ window.__ModuleLoader__.load({
           }, '⚠')
           : null,
       )
+    }
 
-      if (detailAt === null) return row
-      const fact = (key, value, className) => h('div', { className: 'sa-detail-fact' },
+    /** 悬浮详情卡片：完整展示描述与写入范围，内容超高时在卡片内滚动（鼠标可停在卡片上滚动/选中文字）。 */
+    function TaskDetail({ t, task, placement, detailRef, onEnter, onLeave }) {
+      const { tone, text } = taskStatus(t, task)
+      // key 用 label 文案：facts 是数组，缺 key 时 React 会告警。
+      const fact = (key, value, className) => h('div', { className: 'sa-detail-fact', key },
         h('span', { className: 'sa-detail-key' }, key),
         h('span', { className: `sa-detail-value${className ? ` ${className}` : ''}` }, value),
       )
@@ -775,22 +799,87 @@ window.__ModuleLoader__.load({
       if (task.writeScopes.length > 0) facts.push(fact(t('task.label.scopes'), task.writeScopes.join(', '), 'mono'))
       if (task.writeScopeWarnings.length > 0) facts.push(fact(t('task.label.warnings'), task.writeScopeWarnings.join('；'), 'warn'))
 
-      return h(React.Fragment, null, row,
-        h('div', {
-          className: 'sa-detail',
-          role: 'tooltip',
-          'data-task-detail': task.id,
-          style: { left: `${detailAt.left}px`, top: `${detailAt.top}px` },
-        },
-          h('div', { className: 'sa-detail-head' },
-            h('span', { className: 'sa-detail-id' }, task.id),
-            h('span', { className: 'sa-dot sa-task-dot', 'data-tone': tone, 'aria-hidden': true }),
-            h('span', { className: 'sa-detail-status' }, statusText),
-          ),
-          h('div', { className: 'sa-detail-subject' }, task.subject || task.id),
-          task.description ? h('div', { className: 'sa-detail-desc' }, task.description) : null,
-          h('div', { className: 'sa-detail-facts' }, facts),
+      return h('div', {
+        className: 'sa-detail',
+        role: 'tooltip',
+        ref: detailRef,
+        'data-task-detail': task.id,
+        style: { left: `${placement.left}px`, top: `${placement.top}px`, width: `${placement.width}px` },
+        onMouseEnter: onEnter,
+        onMouseLeave: onLeave,
+      },
+        h('div', { className: 'sa-detail-head' },
+          h('span', { className: 'sa-detail-id' }, task.id),
+          h('span', { className: 'sa-dot', 'data-tone': tone, 'aria-hidden': true }),
+          h('span', { className: 'sa-detail-status' }, text),
         ),
+        h('div', { className: 'sa-detail-subject' }, task.subject || task.id),
+        task.description ? h('div', { className: 'sa-detail-desc' }, task.description) : null,
+        h('div', { className: 'sa-detail-facts' }, facts),
+      )
+    }
+
+    /**
+     * 任务列表 + 唯一的悬浮详情。详情状态放在列表层而不是每一行里：鼠标从一行移到另一行时
+     * 只保留一张卡（行自己管会在延迟收起的窗口里同时出现两张）；「离开行/卡片后延迟收起」
+     * 让鼠标能移到卡片上滚动、选中长文本。
+     */
+    function TeamTasks({ t, tasks }) {
+      // detail 只记 id 与位置；任务数据每次渲染都从 tasks 里取，任务更新时卡片内容跟着刷新。
+      const [detail, setDetail] = React.useState(null)
+      const detailRef = React.useRef(null)
+      const hideTimer = React.useRef(0)
+
+      const cancelHide = () => {
+        if (hideTimer.current !== 0) {
+          window.clearTimeout(hideTimer.current)
+          hideTimer.current = 0
+        }
+      }
+      const scheduleHide = () => {
+        cancelHide()
+        hideTimer.current = window.setTimeout(() => {
+          hideTimer.current = 0
+          setDetail(null)
+        }, DETAIL_HIDE_DELAY)
+      }
+      React.useEffect(() => cancelHide, [])
+
+      // 长卡片按实际高度夹进视口（在绘制前完成，不会闪一帧）：溢出时整体上移。
+      React.useLayoutEffect(() => {
+        if (detail === null) return
+        const element = detailRef.current
+        if (element === null) return
+        const rect = element.getBoundingClientRect()
+        const overflow = rect.bottom - (window.innerHeight - VIEWPORT_MARGIN)
+        if (overflow <= 0) return
+        const top = Math.max(VIEWPORT_MARGIN, Math.round(rect.top - overflow))
+        setDetail((current) => (current === null || current.top === top ? current : { ...current, top }))
+      }, [detail])
+
+      const detailTask = detail === null ? undefined : tasks.find((task) => task.id === detail.id)
+
+      return h(React.Fragment, null,
+        tasks.map((task) => h(TaskRow, {
+          key: task.id,
+          t,
+          task,
+          onEnter: (event) => {
+            cancelHide()
+            setDetail({ id: task.id, ...detailPlacement(event.currentTarget.getBoundingClientRect()) })
+          },
+          onLeave: scheduleHide,
+        })),
+        detailTask === undefined
+          ? null
+          : h(TaskDetail, {
+            t,
+            task: detailTask,
+            placement: detail,
+            detailRef,
+            onEnter: cancelHide,
+            onLeave: scheduleHide,
+          }),
       )
     }
 
@@ -988,7 +1077,7 @@ window.__ModuleLoader__.load({
             h('span', { className: 'sa-team-title' }, t('task.title')),
           ),
           team.failure ? h('div', { className: 'sa-team-failure' }, t('task.failure', { message: team.failure })) : null,
-          h('div', { className: 'sa-team-body' }, teamTasks.map((task) => h(TaskRow, { key: task.id, t, task }))),
+          h('div', { className: 'sa-team-body' }, h(TeamTasks, { t, tasks: teamTasks })),
         )
 
       if (!shown) {
